@@ -1,0 +1,15 @@
+{
+    "name": "laraspells/extension-model-factory",
+    "description": "LaraSpells extension to generate model factory",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Muhammad Syifa",
+            "email": "emsifa@gmail.com"
+        }
+    ],
+    "autoload": {
+        "LaraSpells\\Extension\\ModelFactory\\": "src"
+    },
+    "require": {}
+}
