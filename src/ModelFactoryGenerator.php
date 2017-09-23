@@ -237,7 +237,7 @@ class ModelFactoryGenerator extends BaseGenerator
                 }
             },
             // content
-            function isInputFile(), $type, $field) {
+            function () use ($tableName, $colName, $type, $field) {
                 if ($this->like($colName, "(content|body)") && $this->typeIs($type, ['TEXT', 'LONGTEXT', 'MEDIUMTEXT', 'SMALLTEXT'])) {
                     return "\$faker->paragraphs(rand(5, 10), true)";
                 }
