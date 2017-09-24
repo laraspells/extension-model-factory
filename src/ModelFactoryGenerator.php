@@ -171,7 +171,7 @@ class ModelFactoryGenerator extends BaseGenerator
             // district
             function () use ($tableName, $colName, $type, $field) {
                 if ($this->like($colName, $this->districts) && !$this->isFieldId($field)) {
-                    return "\$faker->district";
+                    return "\$faker->state";
                 }
             },
             // address
@@ -231,7 +231,7 @@ class ModelFactoryGenerator extends BaseGenerator
             },
             // token
             function () use ($tableName, $colName, $type, $field) {
-                if ($this->like($colName, "(token)")) {
+                if ($this->like($colName, "(token|^kd_|^kode_|_code$)")) {
                     $length = $field->getLength();
                     return "str_random({$length})";
                 }
