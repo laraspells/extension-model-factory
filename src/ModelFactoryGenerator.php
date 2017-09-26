@@ -69,6 +69,42 @@ class ModelFactoryGenerator extends BaseGenerator
         $code = new CodeGenerator;
         $fillables = $this->getTableSchema()->getFillableColumns();
         $fieldUploads = $this->getTableSchema()->getInputFileFields();
+        $fieldRelations = array_filter($this->getTableSchema()->getFields(), function ($field) {
+            return !empty($field->getRelation());
+            return (
+                is_array($options) 
+                AND isset($options['table'])
+                AND isset($options['value'])
+            );
+        });
+
+        // Add relations static vars
+        foreach ($fieldRelations as $field) {
+            $colName = $field->getColumnName();
+            $varName = 'options'.ucfirst(camel_case($colName));
+            $code->addCode("static \${$varName};");
+        }
+
+        if ($fieldRelations) $code->nl();
+
+        // Prepare relations options
+        foreach ($fieldRelations as $field) {
+            $colName = $field->getColumnName();
+            $varName = 'options'.ucfirst(camel_case($colName));
+            $relation = $field->getRelation();
+            $refTable = $relation['table'];
+            $refColumn = $relation['key_to'];
+            $relatedTable = $this->getTableSchema()->getRootSchema()->getTable($refTable);
+            $relatedModel = $relatedTable->getModelClass();
+            $code->addCode("
+                if (!is_array(\${$varName})) {
+                    \${$varName} = {$relatedModel}::pluck('{$refColumn}')->toArray();
+                    if (empty(\${$varName})) throw new Exception('Cannot generate factory. {$relatedModel} records is empty.');
+                }
+            ");
+        }
+
+        if ($fieldRelations) $code->nl();
         
         // Upload path and dir
         foreach ($fieldUploads as $field) {
@@ -99,6 +135,14 @@ class ModelFactoryGenerator extends BaseGenerator
         $colName = $field->getColumnName();
 
         $fakers = [
+            // relation
+            function () use ($tableName, $colName, $type, $params, $field) {
+                if ($field->getRelation()) {
+                    $colName = $field->getColumnName();
+                    $varName = 'options'.ucfirst(camel_case($colName));
+                    return "\$faker->randomElement(\${$varName})";
+                }
+            },
             // enum
             function () use ($tableName, $colName, $type, $params, $field) {
                 if ($this->typeIs($type, 'ENUM')) {
