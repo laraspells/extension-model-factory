@@ -9,7 +9,9 @@
         }
     ],
     "autoload": {
-        "LaraSpells\\Extension\\ModelFactory\\": "src"
+        "psr-4": {
+            "LaraSpells\\Extension\\ModelFactory\\": "src"
+        }
     },
     "require": {}
 }
